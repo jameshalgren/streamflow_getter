@@ -13,6 +13,12 @@ Decisions from planning, 2026-10-19. Update as they change.
   `NGIAB_data_preprocess` does.
 - Default test case: the **forecast of 2026-04-19** (Alabama event).
 
+- **Forecast t0 from analysis**: when fetching short, medium or long range
+  forecasts, by default also fetch t0 from `analysis_assim` (`tm00`, valid at
+  the forecast cycle time) so the series reads t0, then the forecast hours.
+  Provide an option to turn it off (e.g. `--no-t0`). Mark these rows in the
+  output (lead time 0, source product `analysis_assim`).
+
 ## Gates (do not start until cleared)
 - **GEOGLOWS**: check with Riley Hales first.
 - **Further NWM retrospective work**: check with Josh Cunningham first.
@@ -50,6 +56,15 @@ Decisions from planning, 2026-10-19. Update as they change.
 - [ ] Handle model-version changes across 2018-2026 (variables, reach sets).
 - [ ] Event database integration (SEED/CSES): named events as date range + reaches.
 - [ ] Interviews: Josh Cunningham (NWM retrospective), Riley Hales (GEOGLOWS).
+
+## Open questions on t0
+- Confirm `analysis_assim` `tm00` is valid at the same time as the cycle
+  reference time for every product and cycle (short: hourly; medium and long:
+  6-hourly), and that each cycle has a matching analysis file.
+- Same t0 for all ensemble members (medium/long range): fetch once, attach to
+  each member.
+- `no_da` forecast variants (e.g. `medium_range_no_da`) pair with
+  `analysis_assim_no_da`; non-CONUS domains have their own analysis products.
 
 ## Order of work
 1. Benchmark Kerchunk vs native on the 2026-04-19 forecast.
