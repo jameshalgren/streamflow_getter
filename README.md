@@ -63,5 +63,14 @@ tests/                   tests
 
 ## Contributing
 
-We are two developers working on `main` while the structure settles. Open an
-issue or ping the other developer before large changes.
+`main` is protected: no direct pushes. Work on a branch, open a pull request,
+get one approval and a passing `test` check, then squash-merge.
+
+```bash
+git switch -c my-change
+# ...edit, commit...
+git push -u origin my-change
+gh pr create --fill
+```
+
+Keep branches short-lived, and pull `main` before starting new work.
