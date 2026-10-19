@@ -1,0 +1,58 @@
+# Roadmap: operational NWM data, events, GEOGLOWS
+
+Decisions from planning, 2026-10-19. Update as they change.
+
+## Principles
+- Support every NWM product (analysis_assim, short/medium/long range, ensemble
+  members, domains), selecting like `nwmurl` does but more reliably.
+- Selection is by **event**, **long period**, or **last few days**. An event
+  database (SEED/CSES, hub.ciroh.org) comes later; design the date selection
+  so an event is just a named date range plus reaches.
+- **Kerchunk first** (faster, less bandwidth); **native NetCDF fallback** must
+  also work. Pre-process references into a local cache first, as
+  `NGIAB_data_preprocess` does.
+- Default test case: the **forecast of 2026-04-19** (Alabama event).
+
+## Gates (do not start until cleared)
+- **GEOGLOWS**: check with Riley Hales first.
+- **Further NWM retrospective work**: check with Josh Cunningham first.
+- Interviews with both are useful but not initial.
+
+## Findings so far
+- S3 `noaa-nwm-pds/nwm.20260419/` exists with all products (also forcing,
+  `usgs_timeslices`).
+- CIROH Kerchunk references: `s3://ciroh-nwm-zarr-copy/national-water-model/nwm.YYYYMMDD/<product>/<file>.nc.json`
+  - Day folders seen 2018-09-17 to 2026-10-18 (2,954 days), including 2026-04-19.
+  - One ~11 KB JSON per NetCDF file, 288 in the `analysis_assim` folder of one day.
+  - The top-level `nwm.2022*`/`nwm.2023*` folders in the same bucket are an
+    older, shorter layout (2022-04 to 2023-09-14, 375 days).
+  - The hub page says these "point to Google assets", with a text change
+    needed to point at AWS. Page: https://hub.ciroh.org/docs/products/data-management/dataaccess/
+- `nwmurl` 1.0.8 installs from PyPI (CIROH library for building NWM URLs).
+- Retrospective v3.0 CONUS zarr time axis ends 2023-02-01 as read from the
+  store, not 2024. **Confirm with Josh** whether a longer retrospective exists.
+
+## TODO
+- [ ] **Document data date ranges** per source/product/domain (GCS from
+  2018-09-17, S3 `noaa-nwm-pds` from 2025-01-01 per teammate notes: verify,
+  since the 2026-04-19 folder exists; retrospectives; GEOGLOWS).
+- [ ] Benchmark Kerchunk vs native files (time, bytes read) for a few reaches
+  over days/weeks; test the CIROH references for age/version. If upgrading
+  helps, send the CIROH data-access maintainers a recommendation with numbers.
+- [ ] Local reference cache: build/download Kerchunk refs per date range and
+  product once, reuse after (`~/.cache/streamflow_getter`, configurable).
+- [ ] Native-file reader as fallback (nwmurl for URLs).
+- [ ] Reach resolution for operational data: channel_rt files have no lat/lon
+  or gage IDs. Use RouteLink / channel hydrofabric for gage, point, bbox,
+  polygon selection. Share with the map later.
+- [ ] Output: Parquet alongside CSV (`--format`, inferred from extension).
+  Keep forecast reference time and lead time as columns, not just valid time.
+- [ ] Handle model-version changes across 2018-2026 (variables, reach sets).
+- [ ] Event database integration (SEED/CSES): named events as date range + reaches.
+- [ ] Interviews: Josh Cunningham (NWM retrospective), Riley Hales (GEOGLOWS).
+
+## Order of work
+1. Benchmark Kerchunk vs native on the 2026-04-19 forecast.
+2. Reach resolution (RouteLink).
+3. Operational fetch: Kerchunk path, then native fallback, then cache.
+4. Parquet output.
