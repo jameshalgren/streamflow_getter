@@ -32,3 +32,12 @@ are unverified; check them before relying on them.
 - Without a USGS API key, requests get HTTP 429 and gages silently drop out.
 - Browser CORS works on `noaa-nwm-pds` and the GCS JSON API, not direct GCS
   URLs. Matters for the single-page site.
+
+## Prior art
+The CIROH Data Access page (https://hub.ciroh.org/docs/products/data-management/dataaccess/,
+"Version 2.1" section) has a demo script that pulls reach time series from
+`s3://noaa-nwm-retrospective-2-1-zarr-pds/chrtout.zarr` into per-reach CSVs. It
+indexes time by hours since 1979-02-01; we select by label instead. More
+notebooks: https://github.com/CIROH-UA/data_access_example/.
+Both retrospective stores carry a `gage_id` coordinate (~8,000 gages,
+8-digit zero-padded USGS IDs); v2.1 ends 2020-12-31, v3.0 ends 2023-02-01.

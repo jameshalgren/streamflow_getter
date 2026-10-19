@@ -5,7 +5,7 @@ hydrologic model output, using one command-line tool. A single-page map
 website will sit on top of the same tool, so anything the website does, the
 CLI can do.
 
-> **Status:** early development. The `nwm` command works (CONUS v3.0 retrospective, 1979-2023).
+> **Status:** early development. The `nwm` command works (CONUS retrospective v3.0 and v2.1, by reach or USGS gage).
 
 ## Goal
 
@@ -27,6 +27,10 @@ hydrofabrics come later.
 # NWM streamflow for two reaches, as CSV
 streamflow-getter nwm --reach 101 --reach 179 \
     --start 2020-01-01 --end 2020-01-31 --out flow.csv
+
+# ...or by USGS gage ID, from the older v2.1 retrospective
+streamflow-getter nwm --gage 01646500 --version 2.1 \
+    --start 2015-05-23 --end 2015-06-24 --out flow.csv
 ```
 
 Flags may change. Output columns: `time` (UTC), `feature_id`, `streamflow` (m³/s).
