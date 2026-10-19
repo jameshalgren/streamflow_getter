@@ -63,8 +63,10 @@ tests/                   tests
 
 ## Contributing
 
-`main` is protected: no direct pushes. Work on a branch, open a pull request,
-get one approval and a passing `test` check, then squash-merge.
+`main` is protected: no direct pushes. All changes arrive by pull request and
+need one approval and a passing `test` check. PRs are squash-merged.
+
+**Maintainer:** work on a branch in this repo.
 
 ```bash
 git switch -c my-change
@@ -73,4 +75,23 @@ git push -u origin my-change
 gh pr create --fill
 ```
 
-Keep branches short-lived, and pull `main` before starting new work.
+**Contributors:** work from your own fork.
+
+```bash
+gh repo fork jameshalgren/streamflow_getter --clone
+cd streamflow_getter
+git remote -v                      # origin = your fork, upstream = this repo
+git switch -c my-change
+# ...edit, commit...
+git push -u origin my-change
+gh pr create --repo jameshalgren/streamflow_getter --fill
+```
+
+Keep your fork current before starting new work:
+
+```bash
+gh repo sync <your-username>/streamflow_getter
+git switch main && git pull
+```
+
+Keep branches short-lived and PRs small.
