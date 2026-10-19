@@ -4,7 +4,13 @@ version = "0.0.1"
 description = "Download streamflow time series from NWM, NRDS and GEOGLOWS output"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "dask>=2026.8.0",
+    "pandas>=3.0.6",
+    "s3fs>=2026.9.0",
+    "xarray>=2026.9.0",
+    "zarr>=3.1.6",
+]
 
 [project.scripts]
 streamflow-getter = "streamflow_getter.cli:main"

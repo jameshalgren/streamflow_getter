@@ -5,7 +5,7 @@ hydrologic model output, using one command-line tool. A single-page map
 website will sit on top of the same tool, so anything the website does, the
 CLI can do.
 
-> **Status:** early development. Nothing below works yet except where marked.
+> **Status:** early development. The `nwm` command works (CONUS v3.0 retrospective, 1979-2023).
 
 ## Goal
 
@@ -13,7 +13,7 @@ Pick a reach, pick a date range, get a time series file.
 
 | Source | Reach ID | Status |
 |---|---|---|
-| NOAA National Water Model (NWM) | `feature_id` (COMID) | first target |
+| NOAA National Water Model (NWM) | `feature_id` (COMID) | working (v3.0 retrospective) |
 | NextGen Research DataStream (NRDS) | NextGen hydrofabric IDs (`wb-*`, `cat-*`) | planned |
 | GEOGLOWS | `LINKNO` | planned |
 
@@ -29,7 +29,8 @@ streamflow-getter nwm --reach 101 --reach 179 \
     --start 2020-01-01 --end 2020-01-31 --out flow.csv
 ```
 
-The command name and flags will change as the first adapter takes shape.
+Flags may change. Output columns: `time` (UTC), `feature_id`, `streamflow` (m³/s).
+Background on the NWM network and data: [docs/nwm-notes.md](docs/nwm-notes.md).
 
 ## Design
 
