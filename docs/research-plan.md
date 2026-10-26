@@ -11,7 +11,48 @@ Compare operational **National Water Model (NWM) v3.0 short-range streamflow for
 
 ---
 
-## 2. Relationship to the Roadmap
+## 2. Next Steps
+
+Work top to bottom. Steps within a phase can run in parallel. Phases 0–2 need no new package code; Phase 3 waits on the answers from Phase 1. Question IDs (Q1…) refer to §9.
+
+### Phase 0 — Set up (no answers needed)
+
+| # | Step | Done when |
+|---|---|---|
+| 1 | Push `docs/research-plan-roadmap` to the fork. Sign in as `jjohns314` when the Git Credential Manager window opens | Branch shows on github.com/jjohns314/streamflow_getter |
+| 2 | Install [uv](https://docs.astral.sh/uv/) and the GitHub CLI (`gh`), then run `uv sync` and `uv run pytest` | Tests pass locally |
+| 3 | Reset fork `main` to upstream. It carries one extra commit ("Add files via upload") that breaks "`main` tracks upstream" (§10). Do this only after step 1, so this plan is safe on its branch: `git switch main`, `git reset --hard upstream/main`, `git push --force-with-lease origin main` | Fork `main` matches upstream |
+
+### Phase 1 — Get answers (ask early; everything in Phase 3 waits on these)
+
+| # | Step | Done when |
+|---|---|---|
+| 4 | Send James this plan (branch link, or a PR to upstream if he wants it in the repo). Ask Q6 and Q7 | Scope and ownership agreed |
+| 5 | Meet with advisor. Ask Q1, Q2, Q3 | NRDS package, lead times and study period chosen |
+
+### Phase 2 — Look at the data by hand (start while waiting on Phase 1)
+
+Use a notebook or scratch script outside `src/`; nothing here goes into the package yet.
+
+| # | Step | Done when |
+|---|---|---|
+| 6 | Find NRDS t-route output for 03W around 2026-04-19. Open one file and record format, ID type (`nex-`, `wb-` or `cat-`), units, time zone and time step | Q4 and Q5 answered; §4.2 updated |
+| 7 | Get the 03W crosswalk and check that it maps COMIDs to the ID type found in step 6 | Q8 answered |
+| 8 | Pick 5–10 Alabama USGS gages with flow during the 2026-04-19 event; list gage ID, COMID and NextGen ID for each | Anchor list saved as a small CSV |
+| 9 | For those COMIDs, pull one short-range cycle plus its `analysis_assim` `tm00` by hand and plot against NRDS | One side-by-side plot that looks plausible |
+
+### Phase 3 — Code (after Phase 1)
+
+| # | Step | Branch | Done when |
+|---|---|---|---|
+| 10 | The roadmap step James assigns (likely the Kerchunk vs native benchmark or RouteLink reach resolution) | `feature/<roadmap step>` | PR merged upstream |
+| 11 | `nrds.py` + `crosswalk.py`, tested on the anchor gages | `feature/nrds-adapter` | PR open |
+| 12 | `stats.py` + analysis for the 2026-04-19 event | `feature/stats-comparison` | First metrics table per gage and lead time |
+| 13 | Extend to the full study period from Q3 | — | Results exported to Parquet / CSV |
+
+---
+
+## 3. Relationship to the Roadmap
 
 `docs/ROADMAP.md` is the upstream plan for the data tool itself; this document is a study that uses it. Where they overlap, the roadmap wins and this plan builds on it rather than duplicating it.
 
@@ -27,9 +68,9 @@ Compare operational **National Water Model (NWM) v3.0 short-range streamflow for
 
 ---
 
-## 3. Data Sources
+## 4. Data Sources
 
-### 3.1 National Water Model — Operational Short-Range
+### 4.1 National Water Model — Operational Short-Range
 
 | Property | Value |
 |---|---|
@@ -53,7 +94,7 @@ Compare operational **National Water Model (NWM) v3.0 short-range streamflow for
 - `_FillValue = -99990` — mask before any statistics
 - `channel_rt` files have no lat/lon or gage IDs; resolve reaches through RouteLink
 
-### 3.2 NextGen Research DataStream (NRDS) — T-route Output
+### 4.2 NextGen Research DataStream (NRDS) — T-route Output
 
 NRDS packages t-route routed streamflow at NextGen **nexus points**. BYU has access through the CIROH partnership.
 
@@ -66,13 +107,13 @@ NRDS packages t-route routed streamflow at NextGen **nexus points**. BYU has acc
 **Expected format:** CSV or Parquet files with columns similar to `time`, `nexus_id`, `streamflow_cms`. Confirm units and time zone on first data inspection.
 
 **Key gotchas:**
-- NRDS uses NextGen hydrofabric IDs (`nex-XXXXXXX`), not NHDPlus COMIDs — a crosswalk is required before any comparison
+- NRDS uses NextGen hydrofabric IDs, not NHDPlus COMIDs — a crosswalk is required before any comparison. This plan assumes nexus IDs (`nex-XXXXXXX`); the README lists `wb-*` / `cat-*`. Confirm which the output uses (Q5)
 - The 03W crosswalk (NWM COMID → NextGen nexus) is **lossy**: multiple COMIDs average into one nexus, which biases flow low. Document and account for this in statistical interpretation. Sources: the Lynker hydrofabric, or the `nwmxwalk` repo named in `docs/nwm-notes.md`
 - Confirm whether your NRDS package contains t-route output or raw catchment runoff — only routed flow is directly comparable to NWM `channel_rt`
 
 ---
 
-## 4. Spatial Scope
+## 5. Spatial Scope
 
 ### Initial: Alabama (VPU 03W)
 - VPU 03W covers most of Alabama and is the **only VPU with a published NWM↔NextGen crosswalk** at this time
@@ -86,11 +127,11 @@ NRDS packages t-route routed streamflow at NextGen **nexus points**. BYU has acc
 
 ---
 
-## 5. Code Plan
+## 6. Code Plan
 
 All new code follows the existing adapter pattern in `src/streamflow_getter/` — each source gets its own module with a `fetch(reach_ids, start, end, variable) -> pd.DataFrame` interface.
 
-### 5.1 Modules
+### 6.1 Modules
 
 ```
 src/streamflow_getter/
@@ -103,7 +144,7 @@ src/streamflow_getter/
 
 The operational fetcher is roadmap work (order of work, steps 1–3), not a separate short-range-only module. Contribute to it rather than writing a parallel `nwm_operational.py`.
 
-### 5.2 Operational fetch — what this study needs from it
+### 6.2 Operational fetch — what this study needs from it
 
 ```python
 def fetch_operational(
@@ -121,7 +162,7 @@ def fetch_operational(
 
 Keeping `reference_time` and `lead_time` matters here: each valid time appears in up to 18 forecasts plus the analysis, so `time` alone does not identify a row.
 
-### 5.3 `nrds.py` — key functions
+### 6.3 `nrds.py` — key functions
 
 ```python
 def fetch_nrds(
@@ -133,7 +174,7 @@ def fetch_nrds(
     """Load NRDS t-route output. Columns: time, nexus_id, streamflow (m3/s)."""
 ```
 
-### 5.4 `crosswalk.py` — key functions
+### 6.4 `crosswalk.py` — key functions
 
 ```python
 def load_crosswalk(vpu: str = "03W") -> pd.DataFrame:
@@ -144,7 +185,7 @@ def align(nwm_df: pd.DataFrame, nrds_df: pd.DataFrame, vpu: str = "03W") -> pd.D
     keeping reference_time and lead_time from the NWM side."""
 ```
 
-### 5.5 `stats.py` — metrics to implement
+### 6.5 `stats.py` — metrics to implement
 
 ```python
 def nse(observed, simulated) -> float:
@@ -165,7 +206,7 @@ def compare(aligned_df: pd.DataFrame) -> pd.DataFrame:
 
 ---
 
-## 6. Analysis Workflow
+## 7. Analysis Workflow
 
 ```
 1. Select VPU and date range (start with the 2026-04-19 Alabama event)
@@ -191,7 +232,7 @@ def compare(aligned_df: pd.DataFrame) -> pd.DataFrame:
 
 ---
 
-## 7. Statistical Framework
+## 8. Statistical Framework
 
 For hydrological model comparison, standard metrics (NSE, KGE, PBIAS, RMSE) are expected by reviewers — not generic significance tests like t-tests. However, the following additional tests are appropriate:
 
@@ -203,19 +244,24 @@ For hydrological model comparison, standard metrics (NSE, KGE, PBIAS, RMSE) are 
 
 ---
 
-## 8. Open Questions (resolve before coding)
+## 9. Open Questions (resolve before coding)
 
-- [ ] **Which NRDS package?** Confirm with advisor which specific CIROH dataset contains Alabama t-route output and its format/location
-- [ ] **Which lead times?** t0 (`analysis_assim` `tm00`) is the analysis-of-record; confirm with advisor which forecast lead times (if any) are also intended
-- [ ] **Date range?** Define the study period beyond the 2026-04-19 event. Short range is 24 cycles × 18 lead times = 432 files per day (24 per day for a single lead time); get read cost from the roadmap's Kerchunk vs native benchmark
-- [ ] **Crosswalk availability:** Verify the 03W crosswalk is accessible from Lynker S3, CIROH JupyterHub, or `nwmxwalk`
-- [ ] **Unit confirmation for NRDS:** Verify NRDS t-route output is in m³/s before any comparison
-- [ ] **Upstream scope (James):** Do `nrds.py`, `crosswalk.py` and `stats.py` belong in `streamflow_getter`, or should the statistics live in a separate analysis repo or folder? The crosswalk is currently marked out of scope in `docs/nwm-notes.md`
-- [ ] **Operational fetch ownership (James):** Who builds which roadmap step (benchmark, RouteLink, operational fetch), so the work is not duplicated
+"Answered by" says who to ask, or which step in §2 finds out by looking. Record each answer here, with the date, when you get it.
+
+| ID | Question | Answered by | Blocks | Answer |
+|---|---|---|---|---|
+| Q1 | **Which NRDS package?** Which CIROH dataset holds Alabama t-route output, and where is it? | Advisor (step 5) | Steps 6, 11 | |
+| Q2 | **Which lead times?** t0 (`analysis_assim` `tm00`) is the analysis-of-record. Which forecast lead times, if any, are also in scope? | Advisor (step 5) | Steps 12, 13 | |
+| Q3 | **Study period?** Which dates beyond the 2026-04-19 event? Short range is 24 cycles × 18 lead times = 432 files per day (24 per day for one lead time); the roadmap's Kerchunk vs native benchmark gives the read cost | Advisor (step 5) | Step 13 | |
+| Q4 | **NRDS units and time:** Is t-route output in m³/s? UTC? What time step? Is it routed flow, not raw catchment runoff? | Data (step 6) | Steps 9, 11 | |
+| Q5 | **NRDS ID type:** Is output keyed by nexus (`nex-`) or by waterbody/catchment (`wb-`, `cat-`, as the README lists)? | Data (step 6) | Steps 7, 11 | |
+| Q6 | **Upstream scope:** Do `nrds.py`, `crosswalk.py` and `stats.py` belong in `streamflow_getter`, or should the statistics live in a separate analysis repo or folder? The crosswalk is marked out of scope in `docs/nwm-notes.md` | James (step 4) | Steps 11, 12 | |
+| Q7 | **Roadmap ownership:** Which roadmap step (benchmark, RouteLink, operational fetch) do you take, so the work isn't duplicated? | James (step 4) | Step 10 | |
+| Q8 | **Crosswalk access:** Can you reach the 03W crosswalk (Lynker S3, CIROH JupyterHub or `nwmxwalk`), and does it map to the ID type from Q5? | Data (step 7) | Step 11 | |
 
 ---
 
-## 9. Branch Strategy
+## 10. Branch Strategy
 
 Working in fork: `github.com/jjohns314/streamflow_getter`
 
@@ -231,7 +277,7 @@ Open PRs to upstream (`jameshalgren`) once each module is tested and documented.
 
 ---
 
-## 10. References
+## 11. References
 
 - Upstream roadmap: `docs/ROADMAP.md`
 - NWM technical notes: `docs/nwm-notes.md`
