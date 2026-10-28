@@ -16,6 +16,10 @@ dependencies = [
 streamflow-getter = "streamflow_getter.cli:main"
 
 [dependency-groups]
+bench = [
+    "h5netcdf>=1.8.2",
+    "h5py>=3.16.0",
+]
 dev = ["pytest"]
 
 [build-system]
