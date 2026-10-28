@@ -40,14 +40,19 @@ Decisions from planning, 2026-10-19. Update as they change.
 
 ## TODO
 - [ ] **Document data date ranges** per source/product/domain (GCS from
-  2018-09-17, S3 `noaa-nwm-pds` from 2025-01-01 per teammate notes: verify,
-  since the 2026-04-19 folder exists; retrospectives; GEOGLOWS).
-- [ ] Benchmark Kerchunk vs native files (time, bytes read) for a few reaches
-  over days/weeks; test the CIROH references for age/version. If upgrading
-  helps, send the CIROH data-access maintainers a recommendation with numbers.
+  2018-09-17, S3 `noaa-nwm-pds` from 2025-01-01, confirmed 2026-10-28;
+  CIROH refs to yesterday; retrospectives; GEOGLOWS).
+- [x] Benchmark Kerchunk vs native files (time, bytes read) for a few reaches;
+  test the CIROH references for age/version. Done 2026-10-28:
+  [docs/benchmarks/kerchunk-vs-native.md](benchmarks/kerchunk-vs-native.md).
+  CIROH refs ~4x faster than native remote reads; the known ~2 MB
+  per-variable-per-file chunk limit remains (re-hosting with new chunking or
+  re-running the CIROH Kerchunk process are still options). Refs lag ~1 day
+  behind `noaa-nwm-pds`. Still open: a weeks-long run.
 - [ ] Local reference cache: build/download Kerchunk refs per date range and
   product once, reuse after (`~/.cache/streamflow_getter`, configurable).
-- [ ] Native-file reader as fallback (nwmurl for URLs).
+- [ ] Native-file reader as fallback (nwmurl for URLs). Download whole files
+  concurrently; h5netcdf byte-range reads were slower than full downloads.
 - [ ] Reach resolution for operational data: channel_rt files have no lat/lon
   or gage IDs. Use RouteLink / channel hydrofabric for gage, point, bbox,
   polygon selection. Share with the map later.
@@ -67,7 +72,7 @@ Decisions from planning, 2026-10-19. Update as they change.
   `analysis_assim_no_da`; non-CONUS domains have their own analysis products.
 
 ## Order of work
-1. Benchmark Kerchunk vs native on the 2026-04-19 forecast.
+1. ~~Benchmark Kerchunk vs native on the 2026-04-19 forecast.~~ Done.
 2. Reach resolution (RouteLink).
 3. Operational fetch: Kerchunk path, then native fallback, then cache.
 4. Parquet output.
