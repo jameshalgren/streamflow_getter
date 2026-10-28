@@ -182,8 +182,18 @@ def _inline(value) -> bytes:
     return base64.b64decode(value[7:]) if value.startswith("base64:") else value.encode()
 
 
+def _chunk_keys(ref: dict, var: str) -> list[str]:
+    meta = json.loads(ref[f"{var}/.zarray"])
+    n = -(-meta["shape"][0] // meta["chunks"][0])
+    return [f"{var}/{i}" for i in range(n)]
+
+
 def kerchunk_direct(date, product, names, ids, workers):
-    """Fetch only the streamflow chunk per file; read feature_id once."""
+    """Fetch only the streamflow chunks holding the reaches; read feature_id once.
+
+    NWM v3.0 files hold each variable in one chunk of all reaches; v3.1 files
+    split streamflow into 3 chunks and feature_id into 6.
+    """
     refs = [_to_s3(r)["refs"] for r in _load_refs(date, product, names, workers)]
     fs = s3fs.S3FileSystem(anon=True, skip_instance_cache=True)
 
@@ -193,19 +203,26 @@ def kerchunk_direct(date, product, names, ids, workers):
 
     first = refs[0]
     fid_meta = json.loads(first["feature_id/.zarray"])
-    if any(r["feature_id/0"][1:] != first["feature_id/0"][1:] for r in refs):
+    fid_keys = _chunk_keys(first, "feature_id")
+    layout = [first[k][1:] for k in fid_keys]  # (offset, length) per chunk
+    if any([r[k][1:] for k in fid_keys] != layout for r in refs):
         raise ValueError("feature_id layout differs across files; read it per file")
-    feature_id = _decode(fetch(first["feature_id/0"]), fid_meta)
-    pos = pd.Index(feature_id).get_indexer(ids)
+    feature_id = np.concatenate([_decode(fetch(first[k]), fid_meta) for k in fid_keys])
+    pos = pd.Index(feature_id[: fid_meta["shape"][0]]).get_indexer(ids)
     if (pos < 0).any():
         raise ValueError(f"feature_id not found: {np.array(ids)[pos < 0].tolist()}")
 
     sf_meta = json.loads(first["streamflow/.zarray"])
     sf_attrs = json.loads(first["streamflow/.zattrs"])
     t_meta = json.loads(first["time/.zarray"])
+    chunk_of = pos // sf_meta["chunks"][0]
+    within = pos % sf_meta["chunks"][0]
 
     def one(r):
-        raw = _decode(fetch(r["streamflow/0"]), sf_meta)[pos]
+        raw = np.empty(len(pos), dtype=sf_meta["dtype"])
+        for c in np.unique(chunk_of):
+            sel = chunk_of == c
+            raw[sel] = _decode(fetch(r[f"streamflow/{c}"]), sf_meta)[within[sel]]
         vals = np.where(raw == sf_meta["fill_value"], np.nan, raw * sf_attrs["scale_factor"])
         minutes = _decode(_inline(r["time/0"]), t_meta)[0]
         return np.datetime64(int(minutes), "m").astype("datetime64[ns]"), vals

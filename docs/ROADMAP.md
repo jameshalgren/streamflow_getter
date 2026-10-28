@@ -41,24 +41,32 @@ Decisions from planning, 2026-10-19. Update as they change.
 ## TODO
 - [ ] **Document data date ranges** per source/product/domain (GCS from
   2018-09-17, S3 `noaa-nwm-pds` from 2025-01-01, confirmed 2026-10-28;
-  CIROH refs to yesterday; retrospectives; GEOGLOWS).
+  CIROH refs to yesterday; retrospectives; GEOGLOWS). Model versions:
+  operational v3.0 -> v3.1 on 2026-08-18 (see docs/nwm-notes.md).
 - [x] Benchmark Kerchunk vs native files (time, bytes read) for a few reaches;
   test the CIROH references for age/version. Done 2026-10-28:
   [docs/benchmarks/kerchunk-vs-native.md](benchmarks/kerchunk-vs-native.md).
-  CIROH refs ~4x faster than native remote reads; the known ~2 MB
-  per-variable-per-file chunk limit remains (re-hosting with new chunking or
+  CIROH refs ~4x faster than native remote reads on v3.0 files, ~2.5-4.5x
+  on v3.1 files (rechunked: ~0.55 MB chunks instead of one ~2 MB chunk per
+  variable per file). The per-chunk floor remains (re-hosting with new chunking or
   re-running the CIROH Kerchunk process are still options). Refs lag ~1 day
   behind `noaa-nwm-pds`. Still open: a weeks-long run.
 - [ ] Local reference cache: build/download Kerchunk refs per date range and
   product once, reuse after (`~/.cache/streamflow_getter`, configurable).
-- [ ] Native-file reader as fallback (nwmurl for URLs). Download whole files
-  concurrently; h5netcdf byte-range reads were slower than full downloads.
+- [ ] Native-file reader as fallback (nwmurl for URLs). h5netcdf byte-range
+  reads were slower than whole-file downloads on v3.0 files but faster on
+  v3.1 files; choose per version, or default to ranges for current data.
 - [ ] Reach resolution for operational data: channel_rt files have no lat/lon
   or gage IDs. Use RouteLink / channel hydrofabric for gage, point, bbox,
-  polygon selection. Share with the map later.
+  polygon selection. Share with the map later. v3.0 and v3.1 share one reach
+  set and lat/lon, so the v3.0 retrospective labels both. Gage tags differ:
+  take them from the RouteLink matching each file's version (v3.1.6 for v3.1).
+  Topology (upstream/downstream, polygon) needs RouteLink `to`.
 - [ ] Output: Parquet alongside CSV (`--format`, inferred from extension).
   Keep forecast reference time and lead time as columns, not just valid time.
-- [ ] Handle model-version changes across 2018-2026 (variables, reach sets).
+- [ ] Handle model-version changes across 2018-2026 (variables, reach sets,
+  chunking). v3.0 -> v3.1 checked (same reaches, new gage tags, rechunked);
+  2.0 -> 2.1 -> 3.0 not yet. Readers must not assume one chunk per variable.
 - [ ] Event database integration (SEED/CSES): named events as date range + reaches.
 - [ ] Interviews: Josh Cunningham (NWM retrospective), Riley Hales (GEOGLOWS).
 
