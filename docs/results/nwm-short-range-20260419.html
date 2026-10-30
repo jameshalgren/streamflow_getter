@@ -1,0 +1,363 @@
+<meta name="dash-one-writer">
+<!--
+  Saved copy of the results page: https://claude.ai/artifact/74iozxbEbQZJiARKVH98kt (page version 4, saved 2026-10-30).
+  This is the page's source, not a standalone page: the charts are drawn by the claude.ai Dashboard
+  runtime (the `dash` and `d3` globals) from nwm_short_range_20260419_all.csv, so opening this file
+  in a browser shows only the text.
+  Regenerate the data with:
+    uv run python scripts/pull_nwm_short_range.py --date 20260419 --all-cycles --out nwm_short_range_20260419_all.csv
+-->
+<style>
+  .nw { display: grid; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); max-width: 72rem; margin-inline: auto; }
+  .nw-head { display: grid; gap: var(--cds-gap-sm); }
+  .nw-head h1 { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); text-wrap: balance; }
+  .nw-lede { margin: 0; max-width: 65ch; font-size: var(--cds-font-size-body); line-height: 1.5; }
+  .nw-meta { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .nw-section { display: grid; gap: var(--cds-gap-md); }
+  .nw-section > h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+  .nw-grid { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+  .nw-card { display: grid; gap: var(--cds-gap-sm); align-content: start; min-width: 0; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); }
+  .nw-card h3 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+  .nw-note { margin: 0; max-width: 65ch; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); line-height: 1.5; }
+  .nw-fact { margin: 0; font-size: var(--cds-font-size-body); line-height: 1.5; font-variant-numeric: tabular-nums; }
+  .nw-key { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); margin: 0; padding: 0; list-style: none; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .nw-key li { display: flex; align-items: center; gap: var(--cds-gap-xs); }
+  .nw-sw { display: inline-block; width: 1rem; height: 2px; border-radius: 1px; background: var(--cds-chart-muted); }
+  .nw-sw.thick { height: 3px; }
+  .nw-chart { position: relative; min-height: 280px; }
+  .nw-chart.short { min-height: 240px; }
+  .nw-chart svg { display: block; overflow: visible; }
+  .nw-chart text { fill: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .nw-fail { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .nw-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+  .nw-tip { position: absolute; pointer-events: none; z-index: 2; min-width: 11rem; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; line-height: 1.45; }
+  .nw-tip .when { color: var(--cds-text-secondary); }
+  .nw-tip .row { display: flex; align-items: center; gap: var(--cds-gap-xs); }
+  .nw-tip .row span:last-child { margin-left: auto; padding-left: var(--cds-pad-sm); }
+  .nw-tip i { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+  .nw-tablebox { overflow-x: auto; }
+  .nw table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); font-variant-numeric: tabular-nums; }
+  .nw th { text-align: right; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .nw td { text-align: right; padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .nw th:first-child, .nw td:first-child { text-align: left; }
+  .nw-method { display: grid; gap: var(--cds-gap-sm); max-width: 65ch; margin: 0; padding-left: 1.1rem; font-size: var(--cds-font-size-body); line-height: 1.5; }
+  .nw code { font-size: .92em; }
+  [data-dash-source-state=empty] { color: transparent; }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+  @media (prefers-reduced-motion: no-preference) {
+    .nw-chart .lines { animation: nw-fade var(--cds-dur-slow) var(--cds-ease-out) both; }
+    @keyframes nw-fade { from { opacity: 0; } to { opacity: 1; } }
+  }
+</style>
+
+<div class="nw">
+  <header class="nw-head">
+    <h1>Alabama NWM short-range check, 19 April 2026</h1>
+    <p class="nw-lede">Every hourly short-range forecast for 19 April, for two Alabama reaches, compared with the NWM analysis valid at the same hour. On the Alabama River, forecasts differed from that analysis by <b data-draw="err" data-source="lead_error" data-field="mape" data-where="feature_id=18239649&amp;lead_time=1">—</b> at hour 1 and <b data-draw="err" data-source="lead_error" data-field="mape" data-where="feature_id=18239649&amp;lead_time=18">—</b> at hour 18. On the Black Warrior, where the analysis itself swings from hour to hour, they differed by <b data-draw="err" data-source="lead_error" data-field="mape" data-where="feature_id=18229923&amp;lead_time=1">—</b> and <b data-draw="err" data-source="lead_error" data-field="mape" data-where="feature_id=18229923&amp;lead_time=18">—</b>.</p>
+    <p class="nw-meta">NWM v3.0 operational, CONUS short range · 24 cycles, lead times 1–18 h, plus each cycle's analysis (t0) · Flow in m³/s · Times in UTC</p>
+  </header>
+
+  <section class="nw-section" id="hydrographs">
+    <h2>Forecasts and analysis through the event</h2>
+    <ul class="nw-key">
+      <li><span class="nw-sw thick" data-series="analysis"></span>Analysis (t0) at each hour</li>
+      <li><span class="nw-sw"></span>Forecast from each hourly cycle</li>
+      <li><span class="nw-sw thick" data-series="hover"></span>Forecast under the pointer</li>
+    </ul>
+    <div class="nw-grid">
+      <article class="nw-card" id="reach-18229923">
+        <h3>Black Warrior River · COMID 18229923</h3>
+        <p class="nw-fact">Analysis flow peaked at <b data-draw="cell" data-source="summary" data-field="peak_cms" data-where="feature_id=18229923">—</b> m³/s at <b data-draw="cell" data-source="summary" data-field="peak_time" data-where="feature_id=18229923">—</b>.</p>
+        <div class="nw-chart" data-draw="hydro" data-reach="18229923" data-source="nwm"></div>
+      </article>
+      <article class="nw-card" id="reach-18239649">
+        <h3>Alabama River · COMID 18239649</h3>
+        <p class="nw-fact">Analysis flow peaked at <b data-draw="cell" data-source="summary" data-field="peak_cms" data-where="feature_id=18239649">—</b> m³/s at <b data-draw="cell" data-source="summary" data-field="peak_time" data-where="feature_id=18239649">—</b>.</p>
+        <div class="nw-chart" data-draw="hydro" data-reach="18239649" data-source="nwm"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="nw-section" id="drift">
+    <h2>How far forecasts drift from the analysis</h2>
+    <div class="nw-grid">
+      <article class="nw-card">
+        <h3>Mean absolute difference from the analysis, by lead time</h3>
+        <p class="nw-note">For each lead time: the average of |forecast − analysis| ÷ analysis over every forecast whose valid hour falls on 19 April. Longer lead times have fewer such hours; the tooltip gives the count.</p>
+        <ul class="nw-key">
+          <li><span class="nw-sw thick" data-series="0"></span>Black Warrior · 18229923</li>
+          <li><span class="nw-sw thick" data-series="1"></span>Alabama River · 18239649</li>
+        </ul>
+        <div class="nw-chart short" data-draw="drift" data-source="lead_error"></div>
+      </article>
+      <article class="nw-card">
+        <h3>By reach</h3>
+        <p class="nw-note">Peak analysis flow on 19 April, and the mean absolute difference from the analysis at three lead times.</p>
+        <div class="nw-tablebox">
+          <table data-source="summary" data-row-key="feature_id">
+            <thead><tr>
+              <th data-field="feature_id">COMID</th>
+              <th data-field="peak_cms">Peak (m³/s)</th>
+              <th data-field="peak_time">Peak time</th>
+              <th data-field="mape_f1">Hour 1</th>
+              <th data-field="mape_f6">Hour 6</th>
+              <th data-field="mape_f18">Hour 18</th>
+            </tr></thead>
+            <tbody data-draw="summary-rows"></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="nw-section" id="method">
+    <h2>What this is, and what it isn't yet</h2>
+    <ul class="nw-method">
+      <li><b>Data.</b> NWM v3.0 operational <code>short_range</code> <code>channel_rt</code> files for all 24 cycles on 19 April 2026, plus each cycle's <code>analysis_assim</code> <code>tm00</code> file, read through CIROH's Kerchunk references on <code>s3://ciroh-nwm-zarr-copy</code> by <code>scripts/pull_nwm_short_range.py</code> in the <code>streamflow_getter</code> fork.</li>
+      <li><b>“Analysis” is the model's own best estimate</b> after data assimilation, not a gage observation. A difference here shows how far a forecast moves from NWM's later analysis, not how wrong it was against the river.</li>
+      <li><b>Lead time is counted from the forecast cycle.</b> The analysis files' own reference time is 3 hours earlier than the cycle, so it can't be used for this.</li>
+      <li><b>The Black Warrior analysis swings several-fold from one hour to the next,</b> and its flows are low late in the day, so its relative differences run large. Worth checking before reading much into them: regulated releases upstream, or gage nudging in the analysis, could each produce swings like these.</li>
+      <li><b>Two reaches only.</b> River names come from the starting script and haven't been checked against the hydrofabric yet.</li>
+      <li><b>Next.</b> Add NRDS t-route output for the same reaches and hours (the NWM vs NextGen comparison in the research plan), then USGS gages as observations.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  (() => {
+    const t = (s) => new Date(String(s).replace(' ', 'T') + 'Z');
+    const ok = (id) => dash.data(id).status === 'ok';
+    const stateOf = (ids) => ids.map((id) => dash.data(id).status).find((s) => s !== 'ok') || 'ok';
+    const fmtPct = d3.format('.1%');
+    const fmtFlow = d3.format(',.1f');
+    const fmtWhen = (d) => d3.utcFormat('%b %-d, %H:%M UTC')(d);
+
+    // Forecast minus analysis at the same valid hour, per reach and lead time.
+    dash.calc('lead_error', {
+      title: 'Forecast vs analysis by lead time',
+      description: 'For each reach and lead time, compares every forecast with the analysis (t0) valid at the same hour on 19 April.',
+      inputs: ['nwm'],
+      fn: (nwm) => {
+        const analysis = new Map();
+        for (const r of nwm) if (r.source_product === 'analysis_assim' && r.streamflow !== '') analysis.set(r.feature_id + '|' + r.time, Number(r.streamflow));
+        const groups = new Map();
+        for (const r of nwm) {
+          const a = analysis.get(r.feature_id + '|' + r.time);
+          if (r.source_product !== 'short_range' || r.streamflow === '' || !(a > 0)) continue;
+          const key = r.feature_id + '|' + r.lead_time;
+          const g = groups.get(key) || {feature_id: r.feature_id, lead_time: Number(r.lead_time), n: 0, diff: 0, absrel: 0};
+          const f = Number(r.streamflow);
+          g.n += 1; g.diff += f - a; g.absrel += Math.abs(f - a) / a;
+          groups.set(key, g);
+        }
+        return [...groups.values()]
+          .map((g) => ({feature_id: g.feature_id, lead_time: g.lead_time, n: g.n, bias_cms: g.diff / g.n, mape: g.absrel / g.n}))
+          .sort((x, y) => x.feature_id.localeCompare(y.feature_id) || x.lead_time - y.lead_time);
+      },
+    });
+
+    // One row per reach: peak analysis flow and the difference at three lead times.
+    dash.calc('summary', {
+      title: 'Summary by reach',
+      description: 'Peak analysis flow and its hour per reach, with the mean absolute relative difference at hours 1, 6 and 18.',
+      inputs: ['nwm', 'lead_error'],
+      fn: (nwm, lead_error) => {
+        const reaches = [...new Set(nwm.map((r) => r.feature_id))].sort();
+        return reaches.map((id) => {
+          const an = nwm.filter((r) => r.feature_id === id && r.source_product === 'analysis_assim' && r.streamflow !== '');
+          const peak = an.reduce((m, r) => (Number(r.streamflow) > Number(m.streamflow) ? r : m), an[0]);
+          const at = (h) => (lead_error.find((r) => r.feature_id === id && r.lead_time === h) || {}).mape;
+          return {feature_id: id, peak_cms: Number(peak.streamflow), peak_time: peak.time, mape_f1: at(1), mape_f6: at(6), mape_f18: at(18)};
+        });
+      },
+    });
+
+    // Legend swatches take the series colors.
+    dash.onData(() => {
+      document.querySelectorAll('.nw-sw[data-series]').forEach((el) => {
+        const s = el.dataset.series;
+        const color = s === 'analysis' ? dash.colors[0] : s === 'hover' ? dash.colors[1] : dash.colors[Number(s) % 8];
+        el.style.background = color;
+      });
+    });
+
+    const fail = (el, ids) => {
+      el.replaceChildren();
+      const s = stateOf(ids);
+      if (s === 'error' || s === 'declined') {
+        const d = document.createElement('div');
+        d.className = 'nw-fail';
+        d.textContent = 'Failed to load';
+        el.append(d);
+      } else if (el.tagName !== 'TBODY') {
+        el.classList.add('dash-skeleton');
+      }
+    };
+
+    // Inline numbers: one cell of a calc, formatted by its field.
+    dash.draw('cell', (el) => {
+      const id = el.dataset.source;
+      if (!ok(id)) { el.textContent = '—'; return; }
+      const [k, v] = el.dataset.where.split('=');
+      const row = dash.data(id).data.find((r) => String(r[k]) === v);
+      const val = row ? row[el.dataset.field] : undefined;
+      if (val === undefined || val === null) { el.textContent = '—'; return; }
+      const f = el.dataset.field;
+      el.textContent = f === 'peak_cms' ? fmtFlow(val) : f === 'peak_time' ? fmtWhen(t(val)) : fmtPct(val);
+    });
+
+    dash.draw('err', (el) => {
+      if (!ok('lead_error')) { el.textContent = '—'; return; }
+      const where = new URLSearchParams(el.dataset.where);
+      const row = dash.data('lead_error').data.find((r) => r.feature_id === where.get('feature_id') && r.lead_time === Number(where.get('lead_time')));
+      el.textContent = row ? fmtPct(row.mape) : '—';
+    });
+
+    const tip = (box) => {
+      let el = box.querySelector('.nw-tip');
+      if (!el) { el = document.createElement('div'); el.className = 'nw-tip'; el.hidden = true; box.append(el); }
+      return el;
+    };
+    const placeTip = (box, el, px, py) => {
+      const w = el.offsetWidth, h = el.offsetHeight, bw = box.clientWidth;
+      let left = px + 12; if (left + w > bw) left = Math.max(0, px - w - 12);
+      el.style.left = left + 'px';
+      el.style.top = Math.max(0, py - h - 8) + 'px';
+    };
+    const tipRow = (color, label, value) => {
+      const r = document.createElement('div'); r.className = 'row';
+      if (color) { const i = document.createElement('i'); i.style.background = color; r.append(i); }
+      const a = document.createElement('span'); a.textContent = label;
+      const b = document.createElement('span'); b.textContent = value;
+      r.append(a, b); return r;
+    };
+    const measure = (svg, labels) => {
+      const probe = svg.append('g').attr('opacity', 0);
+      const w = d3.max(labels, (s) => probe.append('text').text(s).node().getComputedTextLength()) || 0;
+      probe.remove(); return w;
+    };
+
+    // Hydrograph per reach: each cycle's forecast thin and muted, the analysis bold.
+    dash.draw('hydro', (el) => {
+      if (!ok('nwm')) { fail(el, ['nwm']); return; }
+      el.classList.remove('dash-skeleton');
+      el.replaceChildren();
+      const reach = el.dataset.reach;
+      const rows = dash.data('nwm').data
+        .filter((r) => r.feature_id === reach && r.streamflow !== '')
+        .map((r) => ({ref: t(r.reference_time), lead: Number(r.lead_time), time: t(r.time), q: Number(r.streamflow), src: r.source_product}));
+      const analysis = rows.filter((r) => r.src === 'analysis_assim').sort((a, b) => a.time - b.time);
+      const anAt = new Map(analysis.map((r) => [+r.time, r.q]));
+      const cycles = d3.groups(rows, (r) => +r.ref).map(([, v]) => v.sort((a, b) => a.lead - b.lead));
+
+      const W = Math.max(280, el.clientWidth), H = 280, mt = 10, mr = 12, mb = 26;
+      const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+        .attr('aria-label', `Short-range forecasts and analysis for reach ${reach}`);
+      const y = d3.scaleLinear([0, d3.max(rows, (r) => r.q) * 1.05], [H - mb, mt]).nice();
+      const yTicks = y.ticks(5);
+      const ml = measure(svg, yTicks.map((v) => d3.format(',')(v))) + 10;
+      const x = d3.scaleUtc(d3.extent(rows, (r) => r.time), [ml, W - mr]);
+      const xTicks = x.ticks(d3.utcHour.every(W < 520 ? 12 : 6));
+      const fmtX = (d) => (d.getUTCHours() === 0 ? d3.utcFormat('%b %-d')(d) : d3.utcFormat('%H:%M')(d));
+
+      svg.append('g').selectAll('line').data(yTicks).join('line')
+        .attr('x1', ml).attr('x2', W - mr).attr('y1', (v) => y(v)).attr('y2', (v) => y(v))
+        .attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', 1);
+      svg.append('g').selectAll('text').data(yTicks).join('text')
+        .attr('x', ml - 8).attr('y', (v) => y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text((v) => d3.format(',')(v));
+      svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', H - mb).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-axis)');
+      svg.append('g').selectAll('text').data(xTicks).join('text')
+        .attr('x', (d) => x(d)).attr('y', H - mb + 16).attr('text-anchor', 'middle').text(fmtX);
+
+      const line = d3.line().x((r) => x(r.time)).y((r) => y(r.q));
+      const g = svg.append('g').attr('class', 'lines').attr('fill', 'none').attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+      const traces = g.append('g').selectAll('path').data(cycles).join('path')
+        .attr('d', line).attr('stroke', 'var(--cds-chart-muted)').attr('stroke-width', 1).attr('stroke-opacity', 0.6);
+      g.append('path').datum(analysis).attr('d', line).attr('stroke', dash.colors[0]).attr('stroke-width', 2.5);
+      const hot = g.append('path').attr('stroke', dash.colors[1]).attr('stroke-width', 2).attr('opacity', 0);
+      const dot = svg.append('circle').attr('r', 4).attr('fill', dash.colors[1]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5).attr('opacity', 0);
+
+      const pts = rows.filter((r) => r.src === 'short_range');
+      const delaunay = d3.Delaunay.from(pts, (r) => x(r.time), (r) => y(r.q));
+      const tipEl = tip(el);
+      svg.on('pointermove', (ev) => {
+        const [px, py] = d3.pointer(ev);
+        const p = pts[delaunay.find(px, py)];
+        if (!p) return;
+        const cyc = cycles.find((c) => +c[0].ref === +p.ref);
+        hot.datum(cyc).attr('d', line).attr('opacity', 1);
+        traces.attr('stroke-opacity', 0.3);
+        dot.attr('cx', x(p.time)).attr('cy', y(p.q)).attr('opacity', 1);
+        const when = document.createElement('div'); when.className = 'when'; when.textContent = fmtWhen(p.time);
+        const rowsOut = [when, tipRow(dash.colors[1], `${d3.utcFormat('%Hz')(p.ref)} cycle, hour ${p.lead}`, `${fmtFlow(p.q)} m³/s`)];
+        const a = anAt.get(+p.time);
+        if (a !== undefined) rowsOut.push(tipRow(dash.colors[0], 'Analysis', `${fmtFlow(a)} m³/s`));
+        tipEl.replaceChildren(...rowsOut);
+        tipEl.hidden = false;
+        placeTip(el, tipEl, x(p.time) * el.clientWidth / W, y(p.q) * el.clientWidth / W);
+      });
+      svg.on('pointerleave', () => { hot.attr('opacity', 0); dot.attr('opacity', 0); traces.attr('stroke-opacity', 0.6); tipEl.hidden = true; });
+    });
+
+    // Drift by lead time, one line per reach.
+    dash.draw('drift', (el) => {
+      if (!ok('lead_error')) { fail(el, ['nwm']); return; }
+      el.classList.remove('dash-skeleton');
+      el.replaceChildren();
+      const rows = dash.data('lead_error').data;
+      const reaches = [...new Set(rows.map((r) => r.feature_id))].sort();
+      const series = reaches.map((id) => rows.filter((r) => r.feature_id === id));
+      const W = Math.max(280, el.clientWidth), H = 240, mt = 10, mr = 12, mb = 34;
+      const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+        .attr('aria-label', 'Mean absolute difference from the analysis by lead time');
+      const y = d3.scaleLinear([0, d3.max(rows, (r) => r.mape) * 1.1 || 0.01], [H - mb, mt]).nice();
+      const yTicks = y.ticks(4);
+      const ml = measure(svg, yTicks.map(d3.format('.0%'))) + 10;
+      const x = d3.scaleLinear([1, 18], [ml, W - mr]);
+      const xTicks = [1, 3, 6, 9, 12, 15, 18];
+      svg.append('g').selectAll('line').data(yTicks).join('line')
+        .attr('x1', ml).attr('x2', W - mr).attr('y1', (v) => y(v)).attr('y2', (v) => y(v))
+        .attr('stroke', 'var(--cds-chart-grid)');
+      svg.append('g').selectAll('text').data(yTicks).join('text')
+        .attr('x', ml - 8).attr('y', (v) => y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(d3.format('.0%'));
+      svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', H - mb).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-axis)');
+      svg.append('g').selectAll('text').data(xTicks).join('text')
+        .attr('x', (d) => x(d)).attr('y', H - mb + 16).attr('text-anchor', 'middle').text((d) => `${d} h`);
+      svg.append('text').attr('x', (ml + W - mr) / 2).attr('y', H - 2).attr('text-anchor', 'middle').text('Lead time');
+
+      const line = d3.line().x((r) => x(r.lead_time)).y((r) => y(r.mape));
+      const g = svg.append('g').attr('class', 'lines').attr('fill', 'none').attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+      g.selectAll('path').data(series).join('path').attr('d', line).attr('stroke', (_, i) => dash.colors[i % 8]).attr('stroke-width', 2);
+      const rule = svg.append('line').attr('y1', mt).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-reference)').attr('opacity', 0);
+      const dots = svg.append('g').selectAll('circle').data(series).join('circle').attr('r', 3.5)
+        .attr('fill', (_, i) => dash.colors[i % 8]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5).attr('opacity', 0);
+
+      const tipEl = tip(el);
+      svg.on('pointermove', (ev) => {
+        const [px] = d3.pointer(ev);
+        const h = Math.max(1, Math.min(18, Math.round(x.invert(px))));
+        rule.attr('x1', x(h)).attr('x2', x(h)).attr('opacity', 1);
+        const at = series.map((s) => s.find((r) => r.lead_time === h));
+        dots.attr('cx', x(h)).attr('cy', (_, i) => (at[i] ? y(at[i].mape) : -10)).attr('opacity', (_, i) => (at[i] ? 1 : 0));
+        const when = document.createElement('div'); when.className = 'when'; when.textContent = `Hour ${h} · ${at[0] ? at[0].n : 0} forecasts`;
+        tipEl.replaceChildren(when, ...at.map((r, i) => tipRow(dash.colors[i % 8], reaches[i], r ? fmtPct(r.mape) : '—')));
+        tipEl.hidden = false;
+        const top = d3.min(at.filter(Boolean), (r) => y(r.mape)) ?? mt;
+        placeTip(el, tipEl, x(h) * el.clientWidth / W, top * el.clientWidth / W);
+      });
+      svg.on('pointerleave', () => { rule.attr('opacity', 0); dots.attr('opacity', 0); tipEl.hidden = true; });
+    });
+
+    // Summary table body: words only; the table carries the marks.
+    dash.draw('summary-rows', (el) => {
+      if (!ok('summary')) { el.replaceChildren(); return; }
+      el.replaceChildren(...dash.data('summary').data.map((r) => {
+        const tr = document.createElement('tr');
+        [r.feature_id, fmtFlow(r.peak_cms), d3.utcFormat('%H:%M')(t(r.peak_time)),
+          r.mape_f1 == null ? '—' : fmtPct(r.mape_f1), r.mape_f6 == null ? '—' : fmtPct(r.mape_f6), r.mape_f18 == null ? '—' : fmtPct(r.mape_f18)]
+          .forEach((v) => { const td = document.createElement('td'); td.textContent = v; tr.append(td); });
+        return tr;
+      }));
+    });
+  })();
+</script>
