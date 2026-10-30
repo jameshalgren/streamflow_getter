@@ -39,7 +39,7 @@ Use a notebook or scratch script outside `src/`; nothing here goes into the pack
 | 6 | Find NRDS t-route output for 03W around 2026-04-19. Open one file and record format, ID type (`nex-`, `wb-` or `cat-`), units, time zone and time step | Q4 and Q5 answered; §4.2 updated |
 | 7 | Get the 03W crosswalk and check that it maps COMIDs to the ID type found in step 6 | Q8 answered |
 | 8 | Pick 5–10 Alabama USGS gages with flow during the 2026-04-19 event; list gage ID, COMID and NextGen ID for each | Anchor list saved as a small CSV |
-| 9 | For those COMIDs, pull one short-range cycle plus its `analysis_assim` `tm00` by hand and plot against NRDS | One side-by-side plot that looks plausible |
+| 9 | For those COMIDs, pull short range plus its `analysis_assim` `tm00` with `scripts/pull_nwm_short_range.py` (e.g. `--reach <COMID> --all-cycles`) and plot against NRDS | One side-by-side plot that looks plausible |
 
 ### Phase 3 — Code (after Phase 1)
 
@@ -84,15 +84,20 @@ Use a notebook or scratch script outside `src/`; nothing here goes into the pack
 | Variable | `streamflow` (int32, scale_factor=0.01, units: m³/s) |
 | Reach IDs | NHDPlusV2 COMIDs (`feature_id`) |
 
-**Fetch strategy:** Follow the roadmap: read through the CIROH Kerchunk references first and fall back to native NetCDF files (URLs from `nwmurl`), caching references locally. Select reaches by Alabama COMIDs as early as possible so full CONUS arrays are never held in memory. The roadmap's benchmark (Kerchunk vs native on 2026-04-19) decides the default path.
+**Fetch strategy:** Follow the roadmap: read through the CIROH Kerchunk references first and fall back to native NetCDF files (URLs from `nwmurl`), caching references locally. Select reaches by Alabama COMIDs as soon as each file is read. The roadmap's benchmark (Kerchunk vs native on 2026-04-19) decides the default path.
+
+**Working prototype:** `scripts/pull_nwm_short_range.py` reads short range plus t0 through the Kerchunk refs for a list of COMIDs and writes the §6.2 columns. On 2026-04-19 t00z it read 19 files (t0 + f001–f018) for two reaches in about 9 s. Run `uv run python scripts/pull_nwm_short_range.py --help` for options.
 
 **Analysis-of-record:** Use `analysis_assim` `tm00` (lead time 0), which the roadmap fetches by default with each forecast. f001 is a one-hour forecast, not an analysis.
 
 **Key gotchas:**
-- Use the `valid_time` attribute inside the file, not the filename timestamp
-- `streamflow` is encoded as int32; let xarray auto-decode via `scale_factor`
-- `_FillValue = -99990` — mask before any statistics
+- Use the `time` (valid time) variable inside the file, not the filename timestamp
+- **Measure lead time from the forecast cycle, not the file's `reference_time`.** In `analysis_assim` files, `reference_time` is 3 h *before* the cycle (start of the look-back window): the 2026-04-19 t00z `tm00` file has `time` 00:00 but `reference_time` 2026-04-18 21:00. Short-range files have `reference_time` equal to the cycle
+- `streamflow` is int32 counts × `scale_factor` 0.01 → m³/s. Values are only precise to 0.01, so round after scaling (float32 scale factor adds noise like 22.999999)
+- Fill/missing value: the 2026 refs give `-999900` (`fill_value` and `missing_value`); `docs/nwm-notes.md` says `-99990`. Mask both, and any negative flow, before statistics
+- `streamflow` is stored as **one chunk for all of CONUS** (2,776,734 reaches, ~2 MB compressed). Kerchunk saves reading the other six variables, but every file still pulls the whole streamflow array
 - `channel_rt` files have no lat/lon or gage IDs; resolve reaches through RouteLink
+- On Windows, reading the refs through xarray/zarr (async HTTP) crashed Python on exit with a segfault. The prototype avoids zarr and decodes chunks with numcodecs. Mention this to James for the package version
 
 ### 4.2 NextGen Research DataStream (NRDS) — T-route Output
 
@@ -161,6 +166,8 @@ def fetch_operational(
 ```
 
 Keeping `reference_time` and `lead_time` matters here: each valid time appears in up to 18 forecasts plus the analysis, so `time` alone does not identify a row.
+
+`scripts/pull_nwm_short_range.py` already implements this signature (as `fetch_short_range`) for short range on CONUS. It is a prototype for the roadmap's operational fetch, not package code: no native-file fallback, no reference cache, short range only.
 
 ### 6.3 `nrds.py` — key functions
 
@@ -280,6 +287,7 @@ Open PRs to upstream (`jameshalgren`) once each module is tested and documented.
 ## 11. References
 
 - Upstream roadmap: `docs/ROADMAP.md`
+- NWM short-range prototype: `scripts/pull_nwm_short_range.py`
 - NWM technical notes: `docs/nwm-notes.md`
 - NWM operational data (GCS): https://console.cloud.google.com/storage/browser/national-water-model
 - NWM operational data (AWS): `s3://noaa-nwm-pds`
