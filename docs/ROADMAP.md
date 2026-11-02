@@ -41,8 +41,8 @@ Decisions from planning, 2026-10-19. Update as they change.
 ## TODO
 - [ ] **Document data date ranges** per source/product/domain (GCS from
   2018-09-17, S3 `noaa-nwm-pds` from 2025-01-01, confirmed 2026-10-28;
-  CIROH refs to yesterday; retrospectives; GEOGLOWS). Model versions:
-  operational v3.0 -> v3.1 on 2026-08-18 (see docs/nwm-notes.md).
+  CIROH refs to yesterday; retrospectives; GEOGLOWS). Operational model
+  versions 1.2 -> 2.0 -> 2.1 -> 2.2 -> 3.0 -> 3.1 dated in docs/nwm-notes.md.
 - [x] Benchmark Kerchunk vs native files (time, bytes read) for a few reaches;
   test the CIROH references for age/version. Done 2026-10-28:
   [docs/benchmarks/kerchunk-vs-native.md](benchmarks/kerchunk-vs-native.md).
@@ -65,8 +65,10 @@ Decisions from planning, 2026-10-19. Update as they change.
 - [ ] Output: Parquet alongside CSV (`--format`, inferred from extension).
   Keep forecast reference time and lead time as columns, not just valid time.
 - [ ] Handle model-version changes across 2018-2026 (variables, reach sets,
-  chunking). v3.0 -> v3.1 checked (same reaches, new gage tags, rechunked);
-  2.0 -> 2.1 -> 3.0 not yet. Readers must not assume one chunk per variable.
+  chunking). All six versions back to 2018-09-17 dated and load through
+  the CIROH refs (2026-10-28). Three reach sets; chunking and feature_id
+  dtype vary; read layout per file. Still needed: RouteLink per reach set
+  for labels (v2.0/v2.1 copies in ~/git/troute_paper; no v1.2 or v2.2 yet).
 - [ ] Event database integration (SEED/CSES): named events as date range + reaches.
 - [ ] Interviews: Josh Cunningham (NWM retrospective), Riley Hales (GEOGLOWS).
 
