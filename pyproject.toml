@@ -12,6 +12,24 @@ dependencies = [
     "zarr>=3.1.6",
 ]
 
+[project.optional-dependencies]
+spatial = [
+    "geopandas",
+    "pyogrio",
+    "pyproj",
+    "shapely",
+]
+
+parquet = [
+    "pyarrow",
+]
+
+operational = [
+    "h5netcdf",
+    "h5py",
+]
+
+
 [project.scripts]
 streamflow-getter = "streamflow_getter.cli:main"
 

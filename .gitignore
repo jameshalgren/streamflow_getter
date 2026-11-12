@@ -6,3 +6,6 @@ dist/
 *.csv
 *.parquet
 *.nc
+
+# Generated benchmark acceptance evidence
+benchmarks/results/*.manifest.json

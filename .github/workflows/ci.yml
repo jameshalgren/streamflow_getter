@@ -11,5 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv sync
-      - run: uv run pytest
+      - name: Install test dependencies
+        run: uv sync --locked --extra operational --extra spatial --extra parquet
+      - name: Run tests
+        run: uv run --locked --extra operational --extra spatial --extra parquet pytest -q -ra
